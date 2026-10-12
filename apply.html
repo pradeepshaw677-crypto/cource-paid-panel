@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply for Admission | Smart Tech</title>
+
+    <!-- ── SECURITY HEADERS ─────────────────────────────────────── -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com wss://*.firebaseio.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/styles.css">
+
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['Poppins', 'sans-serif'] }, colors: { brandBlue: '#0f4c81', brandGold: '#f59e0b' } } }
+        }
+    </script>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-[#0f172a] shadow-lg sticky top-0 z-40">
+        <div class="max-w-3xl mx-auto px-4 py-4 flex items-center gap-3">
+            <div class="h-10 w-10 rounded-xl bg-brandGold flex items-center justify-center text-[#0f172a] font-black text-xl shadow-sm">ST</div>
+            <div>
+                <h1 class="font-bold text-lg text-white leading-tight">Admission Form</h1>
+                <p class="text-[10px] text-gray-400 uppercase tracking-widest">Smart Tech</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-3xl w-full mx-auto px-4 py-8">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-1"><i class="fa-solid fa-user-plus text-brandBlue mr-2"></i>Apply for Admission</h2>
+            <p class="text-xs text-gray-500 mb-6">Form bharo — admin approve karke tumhe dashboard username &amp; password dega.</p>
+
+            <!-- Alert -->
+            <div id="apply-alert" class="hidden mb-5 p-4 rounded-xl font-bold flex items-center gap-3 text-sm"></div>
+
+            <form id="apply-form" class="space-y-5" autocomplete="on">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Full Name *</label>
+                        <input type="text" id="f-name" required maxlength="80" class="w-full bg-gray-50 border border-gray-200 text-sm rounded-xl p-3.5" placeholder="Apna poora naam">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Email *</label>
+                        <input type="email" id="f-email" required maxlength="120" class="w-full bg-gray-50 border border-gray-200 text-sm rounded-xl p-3.5" placeholder="you@gmail.com">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Mobile Number *</label>
+                        <input type="tel" id="f-mobile" required pattern="[0-9+\-\s]{7,15}" maxlength="15" class="w-full bg-gray-50 border border-gray-200 text-sm rounded-xl p-3.5" placeholder="10-digit mobile">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Course *</label>
+                        <select id="f-course" required class="w-full bg-gray-50 border border-gray-200 text-sm rounded-xl p-3.5">
+                            <option value="">Loading courses...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Fee Type *</label>
+                        <select id="f-feeType" required class="w-full bg-gray-50 border border-gray-200 text-sm rounded-xl p-3.5">
+                            <option value="Full">Full (one-time)</option>
+                            <option value="Monthly">Monthly</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Preferred Timing *</label>
+                        <select id="f-timing" required class="w-full bg-gray-50 border border-gray-200 text-sm rounded-xl p-3.5">
+                            <option value="Morning">Morning</option>
+                            <option value="Afternoon">Afternoon</option>
+                            <option value="Evening">Evening</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Address / Village *</label>
+                        <input type="text" id="f-address" required maxlength="160" class="w-full bg-gray-50 border border-gray-200 text-sm rounded-xl p-3.5" placeholder="House / Street / Village">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-2">State *</label>
+                        <input type="text" id="f-state" required maxlength="60" class="w-full bg-gray-50 border border-gray-200 text-sm rounded-xl p-3.5" placeholder="State">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-2">PIN Code *</label>
+                        <input type="text" id="f-pin" required pattern="[0-9]{4,10}" maxlength="10" class="w-full bg-gray-50 border border-gray-200 text-sm rounded-xl p-3.5" placeholder="PIN">
+                    </div>
+                </div>
+
+                <button type="submit" id="btn-apply" class="w-full bg-brandBlue hover:bg-blue-800 text-white font-bold py-4 rounded-xl shadow-lg transition text-sm">
+                    <i class="fa-solid fa-paper-plane mr-1"></i> Submit Application
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <script type="module" src="./js/apply.js"></script>
+</body>
+</html>

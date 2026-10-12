@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admissions Admin | Smart Tech</title>
+
+    <!-- ── SECURITY HEADERS ─────────────────────────────────────── -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com wss://*.firebaseio.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Local styles -->
+    <link rel="stylesheet" href="./css/styles.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'], },
+                    colors: { brandBlue: '#0f4c81', brandGold: '#f59e0b' }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- HEADER -->
+    <header class="bg-[#0f172a] shadow-lg sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="h-10 w-10 rounded-xl bg-brandGold flex items-center justify-center text-[#0f172a] font-black text-xl shadow-sm">ST</div>
+                <div>
+                    <h1 class="font-bold text-lg text-white leading-tight">Admissions Portal</h1>
+                    <p class="text-[10px] text-gray-400 uppercase tracking-widest">Smart Tech Admin</p>
+                </div>
+            </div>
+            <button id="admin-logout-btn" class="text-red-400 hover:text-red-300 font-bold text-sm flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg transition">
+                <i class="fa-solid fa-power-off"></i> <span class="hidden sm:inline">Logout</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- APPROVE & ASSIGN MODAL (Hidden by default) -->
+    <div id="approve-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden">
+        <div class="bg-white rounded-3xl shadow-2xl p-6 w-[90%] max-w-sm transform scale-95 transition-all duration-300">
+            <div class="text-center mb-4">
+                <div class="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xl mx-auto mb-2"><i class="fa-solid fa-user-check"></i></div>
+                <h3 class="text-lg font-bold text-gray-800">Approve Student</h3>
+                <p id="modal-student-name" class="text-xs font-bold text-brandBlue mt-1"></p>
+            </div>
+
+            <input type="hidden" id="modal-student-id">
+
+            <div class="space-y-4">
+                <div class="bg-blue-50 p-3 rounded-xl border border-blue-100">
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Assign Dashboard Username</label>
+                    <input type="text" id="assign-username" class="w-full bg-white border border-gray-200 p-2.5 rounded-lg text-sm font-bold text-gray-800 outline-none focus:border-brandBlue" placeholder="e.g. ST_Rahul2026">
+                </div>
+                <div class="bg-blue-50 p-3 rounded-xl border border-blue-100">
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Assign Dashboard Password</label>
+                    <input type="text" id="assign-password" class="w-full bg-white border border-gray-200 p-2.5 rounded-lg text-sm font-bold text-gray-800 outline-none focus:border-brandBlue" placeholder="e.g. Pass@123">
+                </div>
+            </div>
+
+            <div class="flex gap-3 mt-6">
+                <button type="button" id="btn-cancel-approve" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-3 rounded-xl transition text-sm">Cancel</button>
+                <button type="button" id="btn-confirm-approve" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl shadow-lg transition text-sm flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-check"></i> Approve
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-8">
+
+        <!-- Top Stats Overview -->
+        <div class="grid grid-cols-3 gap-3 sm:gap-6 mb-8">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-100 text-center flex flex-col justify-center">
+                <p class="text-[10px] sm:text-xs text-blue-500 font-bold uppercase tracking-wider mb-1">Total Admissions</p>
+                <h3 class="text-2xl sm:text-4xl font-black text-brandBlue" id="stat-total">0</h3>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-amber-100 text-center flex flex-col justify-center">
+                <p class="text-[10px] sm:text-xs text-amber-500 font-bold uppercase tracking-wider mb-1">Pending Approval</p>
+                <h3 class="text-2xl sm:text-4xl font-black text-amber-600" id="stat-pending">0</h3>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-green-100 text-center flex flex-col justify-center">
+                <p class="text-[10px] sm:text-xs text-green-500 font-bold uppercase tracking-wider mb-1">Approved</p>
+                <h3 class="text-2xl sm:text-4xl font-black text-green-600" id="stat-approved">0</h3>
+            </div>
+        </div>
+
+        <div class="flex justify-between items-center mb-6 border-b border-gray-200 pb-4">
+            <h2 class="text-xl font-bold text-gray-800">Student Applications</h2>
+            <button id="refresh-btn" class="bg-brandBlue text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm hover:bg-blue-800 transition flex items-center gap-2">
+                <i class="fa-solid fa-rotate-right"></i> Refresh
+            </button>
+        </div>
+
+        <!-- Custom Alert Box -->
+        <div id="admin-alert" class="hidden mb-6 p-4 rounded-xl font-bold flex items-center gap-3 transition-all shadow-sm">
+            <i id="admin-alert-icon" class="fa-solid fa-circle-check text-xl"></i>
+            <span id="admin-alert-msg">Message goes here</span>
+        </div>
+
+        <!-- ADMISSIONS GRID -->
+        <div id="admissions-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="col-span-full flex flex-col items-center justify-center py-20 text-gray-400">
+                <i class="fa-solid fa-spinner fa-spin text-4xl mb-3 text-brandBlue"></i>
+                <p class="text-sm font-bold uppercase tracking-widest">Loading Applications...</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Hardened Firebase module -->
+    <script type="module" src="./js/admissions.js"></script>
+</body>
+</html>

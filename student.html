@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard | Smart Tech</title>
+
+    <!-- ── SECURITY HEADERS ─────────────────────────────────────── -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com wss://*.firebaseio.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="robots" content="noindex, nofollow">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/styles.css">
+
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['Poppins', 'sans-serif'] }, colors: { brandBlue: '#0f4c81', brandGold: '#f59e0b', adminDark: '#0f172a' } } }
+        }
+    </script>
+</head>
+<body class="min-h-screen bg-gray-100">
+
+    <!-- ══ LOGIN SCREEN ══ -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center bg-adminDark p-4">
+        <div class="w-full max-w-sm">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-brandGold rounded-2xl flex items-center justify-center text-adminDark font-black text-3xl mx-auto mb-3 shadow-lg">ST</div>
+                <h1 class="text-white font-bold text-xl">Student Login</h1>
+                <p class="text-gray-400 text-[11px] uppercase tracking-widest mt-1">Smart Tech Dashboard</p>
+            </div>
+            <div class="bg-white rounded-3xl shadow-2xl p-6">
+                <form id="student-login-form" class="space-y-4" autocomplete="off">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Username</label>
+                        <input type="text" id="s-user" required autocomplete="username" class="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl text-sm font-bold text-gray-800 outline-none focus:border-brandBlue" placeholder="e.g. ST_Rahul2026">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Password</label>
+                        <input type="password" id="s-pass" required autocomplete="current-password" class="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl text-sm font-bold text-gray-800 outline-none focus:border-brandBlue" placeholder="••••••••">
+                    </div>
+                    <p id="s-error" class="text-red-500 text-xs font-bold min-h-[16px]"></p>
+                    <button type="submit" id="s-login-btn" class="w-full bg-brandBlue hover:bg-blue-800 text-white font-bold py-3.5 rounded-xl shadow-lg transition text-sm flex justify-center items-center gap-2">
+                        <i class="fa-solid fa-right-to-bracket"></i> Login
+                    </button>
+                </form>
+            </div>
+            <p class="text-center text-gray-500 text-[10px] mt-5"><i class="fa-solid fa-lock mr-1"></i> Secured with Firebase Authentication</p>
+        </div>
+    </div>
+
+    <!-- ══ DASHBOARD ══ -->
+    <div id="dashboard-screen" class="hidden">
+        <header class="bg-adminDark shadow-lg sticky top-0 z-40">
+            <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="h-10 w-10 rounded-xl bg-brandGold flex items-center justify-center text-adminDark font-black text-xl shadow-sm">ST</div>
+                    <div>
+                        <h1 class="font-bold text-base text-white leading-tight">My Learning</h1>
+                        <p id="s-student-name" class="text-[10px] text-gray-400 uppercase tracking-widest"></p>
+                    </div>
+                </div>
+                <button id="s-logout-btn" class="text-red-400 hover:text-red-300 font-bold text-sm flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg transition">
+                    <i class="fa-solid fa-power-off"></i> <span class="hidden sm:inline">Logout</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="max-w-5xl mx-auto px-4 py-8 space-y-8">
+            <div id="s-alert" class="hidden p-4 rounded-xl font-bold text-sm"></div>
+
+            <!-- My Courses -->
+            <section>
+                <h2 class="text-lg font-bold text-gray-800 mb-4"><i class="fa-solid fa-graduation-cap text-brandBlue mr-2"></i>My Unlocked Courses</h2>
+                <div id="s-courses" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <div class="col-span-full text-center py-10 text-gray-400 font-bold"><i class="fa-solid fa-spinner fa-spin text-3xl mb-2 block"></i> Loading...</div>
+                </div>
+            </section>
+
+            <!-- Centre info -->
+            <section id="s-centre-section" class="hidden">
+                <h2 class="text-lg font-bold text-gray-800 mb-4"><i class="fa-solid fa-building text-brandGold mr-2"></i>Our Centre</h2>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div id="s-teacher-box" class="text-center hidden">
+                        <img id="s-teacher-img" src="" alt="Teacher" class="w-24 h-24 object-cover rounded-full border-2 border-brandGold mx-auto mb-2">
+                        <p class="text-xs font-bold text-gray-500 uppercase">Teacher</p>
+                    </div>
+                    <div id="s-tcert-box" class="text-center hidden">
+                        <img id="s-tcert-img" src="" alt="Teacher Certificate" class="h-28 object-contain rounded mx-auto border border-gray-200">
+                        <p class="text-xs font-bold text-gray-500 uppercase mt-2">Teacher Certificate</p>
+                    </div>
+                    <div id="s-scert-box" class="text-center hidden">
+                        <img id="s-scert-img" src="" alt="Sample Certificate" class="h-28 object-contain rounded mx-auto border border-gray-200">
+                        <p class="text-xs font-bold text-gray-500 uppercase mt-2">Sample Certificate</p>
+                    </div>
+                </div>
+                <div id="s-video-box" class="hidden mt-4">
+                    <video id="s-centre-video" controls class="w-full max-h-80 rounded-2xl border border-gray-200 bg-black"></video>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script type="module" src="./js/student.js"></script>
+</body>
+</html>

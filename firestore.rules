@@ -1,0 +1,91 @@
+rules_version = '2';
+
+// ═══════════════════════════════════════════════════════════════════
+//  SMART TECH (smart-tech-d6528) — Firestore Security Rules  [DRAFT]
+//  -----------------------------------------------------------------
+//  ⚠️  BEFORE YOU PUBLISH: replace EVERY occurrence of
+//      REPLACE_WITH_YOUR_ADMIN_EMAIL@example.com
+//      with the real admin login email of this Firebase project.
+//      (Same value you put in js/security.js → ADMIN_EMAILS.)
+//
+//  This is the REAL security. The public web apiKey can read whatever
+//  these rules allow — so locking reads/writes here is what stops a
+//  hacker from stealing data with just the apiKey.
+// ═══════════════════════════════════════════════════════════════════
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && request.auth.token.email in [
+             'REPLACE_WITH_YOUR_ADMIN_EMAIL@example.com'
+           ];
+    }
+
+    // Student apne khud ke admission doc ka owner hai (authUid match).
+    function isAdmissionOwner() {
+      return signedIn()
+        && resource != null
+        && resource.data.authUid == request.auth.uid;
+    }
+
+    // ── Public catalogue / content: anyone may READ, only admin WRITES ──
+    match /courses/{doc} {
+      allow read:  if true;
+      allow write: if isAdmin();
+    }
+    match /banners/{doc} {
+      allow read:  if true;
+      allow write: if isAdmin();
+    }
+    match /gallery/{doc} {
+      allow read:  if true;
+      allow write: if isAdmin();
+    }
+    match /assets/{doc} {
+      allow read:  if true;
+      allow write: if isAdmin();
+    }
+
+    // ── Course unlocks ───────────────────────────────────────────────
+    // docId = the student's lower-cased email. A student dashboard reads
+    // its OWN doc by id (get), but nobody can enumerate the whole
+    // collection (list) and only admin can change it.
+    match /unlocked_courses/{email} {
+      allow get:   if true;
+      allow list:  if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ── Offline admissions ───────────────────────────────────────────
+    // Anyone can SUBMIT an application (public form), but:
+    //   • they can only create it as Pending,
+    //   • they can NOT set dashboardUser / dashboardPass (no self-approve),
+    // and only admin can read / approve / delete applications.
+    match /offline_admissions/{id} {
+      allow create: if
+        ( !('status' in request.resource.data.keys())
+          || request.resource.data.status == 'Pending' )
+        && !('dashboardUser' in request.resource.data.keys())
+        && !('dashboardPass' in request.resource.data.keys())
+        && !('authUid' in request.resource.data.keys());
+
+      // Admin sab padh sakta hai; student SIRF apna doc (authUid == uid).
+      // Query where('authUid','==',uid) is rule se allow hoti hai.
+      allow read: if isAdmin() || isAdmissionOwner();
+
+      // Sirf admin approve/update/delete kar sakta hai.
+      allow update, delete: if isAdmin();
+    }
+
+    // ── Default deny: nothing else is readable or writable ───────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

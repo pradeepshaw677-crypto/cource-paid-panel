@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Smart Tech</title>
+
+    <!-- ── SECURITY HEADERS ─────────────────────────────────────── -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com wss://*.firebaseio.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Local styles -->
+    <link rel="stylesheet" href="./css/styles.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'], },
+                    colors: { brandBlue: '#0f4c81', brandGold: '#f59e0b', adminDark: '#0f172a' }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen flex bg-gray-100">
+
+    <!-- ADMIN SIDEBAR (Desktop) -->
+    <aside class="w-64 bg-adminDark text-white flex-col shadow-2xl hidden md:flex h-screen sticky top-0">
+        <div class="p-6 flex items-center gap-3 border-b border-gray-800">
+            <div class="w-10 h-10 bg-brandGold rounded-lg flex items-center justify-center text-adminDark font-black text-xl">ST</div>
+            <div>
+                <h1 class="font-bold text-lg leading-tight tracking-tight">Admin Panel</h1>
+                <p class="text-[10px] text-gray-400 uppercase tracking-widest">Smart Tech</p>
+            </div>
+        </div>
+
+        <nav class="flex-1 p-4 space-y-2">
+            <button onclick="switchTab('manage-access')" id="btn-manage-access" class="w-full flex items-center gap-3 px-4 py-3 bg-brandBlue text-white rounded-xl font-medium transition text-sm">
+                <i class="fa-solid fa-key w-5"></i> Course Access
+            </button>
+            <button onclick="switchTab('manage-courses')" id="btn-manage-courses" class="w-full flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl font-medium transition text-sm">
+                <i class="fa-solid fa-folder-open w-5"></i> Manage Courses
+            </button>
+            <button onclick="switchTab('manage-centre')" id="btn-manage-centre" class="w-full flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl font-medium transition text-sm">
+                <i class="fa-solid fa-building w-5"></i> Offline Centre
+            </button>
+        </nav>
+
+        <div class="p-4 border-t border-gray-800">
+            <button id="admin-logout-btn" class="w-full flex items-center justify-center gap-2 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white py-3 rounded-xl font-bold transition text-sm">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Secure Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- MOBILE HEADER -->
+    <div class="md:hidden fixed top-0 left-0 w-full bg-adminDark text-white p-4 flex justify-between items-center z-50 shadow-md">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-brandGold rounded-md flex items-center justify-center text-adminDark font-black text-sm">ST</div>
+            <h1 class="font-bold text-base">Admin Panel</h1>
+        </div>
+        <button id="admin-logout-mobile" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-power-off text-xl"></i></button>
+    </div>
+
+    <!-- MOBILE TABS -->
+    <div class="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 grid grid-cols-3 z-50 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
+        <button onclick="switchTab('manage-access')" id="mob-btn-manage-access" class="py-3 text-brandBlue border-t-2 border-brandBlue font-bold text-[10px]"><i class="fa-solid fa-key mb-1 block text-base"></i> Access</button>
+        <button onclick="switchTab('manage-courses')" id="mob-btn-manage-courses" class="py-3 text-gray-500 border-t-2 border-transparent font-medium text-[10px]"><i class="fa-solid fa-square-plus mb-1 block text-base"></i> Courses</button>
+        <button onclick="switchTab('manage-centre')" id="mob-btn-manage-centre" class="py-3 text-gray-500 border-t-2 border-transparent font-medium text-[10px]"><i class="fa-solid fa-building mb-1 block text-base"></i> Centre</button>
+    </div>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 p-6 md:p-10 pt-20 md:pt-10 pb-24 md:pb-10 overflow-y-auto w-full">
+
+        <!-- Custom Alert Box -->
+        <div id="admin-alert" class="hidden mb-6 p-4 rounded-xl font-bold flex items-center gap-3 transition-all shadow-sm z-50 sticky top-20 md:top-0">
+            <i id="admin-alert-icon" class="fa-solid fa-circle-check text-xl"></i>
+            <span id="admin-alert-msg">Message goes here</span>
+        </div>
+
+        <!-- TAB 1: MANAGE ACCESS -->
+        <section id="manage-access" class="tab-content active max-w-2xl mx-auto">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8">
+                <div class="mb-6 border-b border-gray-100 pb-4">
+                    <h2 class="text-2xl font-bold text-gray-800"><i class="fa-solid fa-unlock-keyhole text-brandGold mr-2"></i> Course Access</h2>
+                    <p class="text-xs text-gray-500 mt-1">Unlock or lock courses for students.</p>
+                </div>
+
+                <form id="access-form" class="space-y-5">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Student's Registered Email</label>
+                        <input type="email" id="student-email" required class="w-full bg-gray-50 border border-gray-200 text-sm rounded-xl p-3.5" placeholder="student@gmail.com">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Select Course</label>
+                        <select id="course-select" required class="w-full bg-gray-50 border border-gray-200 text-sm rounded-xl p-3.5">
+                            <option value="">Loading courses...</option>
+                        </select>
+                    </div>
+                    <div class="flex gap-3 pt-4">
+                        <button type="submit" id="btn-unlock" class="flex-1 bg-green-500 text-white font-bold py-3.5 rounded-xl shadow-md"><i class="fa-solid fa-unlock"></i> Grant Access</button>
+                        <button type="button" id="btn-lock" class="flex-1 bg-red-50 text-red-600 font-bold py-3.5 rounded-xl border border-red-200"><i class="fa-solid fa-lock"></i> Revoke Access</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- TAB 2: MANAGE COURSES -->
+        <section id="manage-courses" class="tab-content max-w-3xl mx-auto space-y-8">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8">
+                <div class="mb-6 border-b border-gray-100 pb-4">
+                    <h2 class="text-xl font-bold text-gray-800"><i class="fa-solid fa-folder-plus text-brandBlue mr-2"></i> Create New Course</h2>
+                </div>
+
+                <form id="add-course-form" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Course Title</label>
+                            <input type="text" id="course-title" required class="w-full bg-gray-50 border border-gray-200 text-sm rounded-xl p-3.5" placeholder="e.g. Advanced Tally Prime">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Course Price (₹)</label>
+                            <input type="number" id="course-price" required class="w-full bg-gray-50 border border-gray-200 text-sm rounded-xl p-3.5" placeholder="e.g. 2999">
+                        </div>
+
+                        <!-- Gallery Upload -->
+                        <div class="md:col-span-2 bg-blue-50 p-4 rounded-xl border border-blue-100">
+                            <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Upload Thumbnail from Gallery (Base64)</label>
+                            <input type="file" id="course-thumb-file" accept="image/*" onchange="previewLocalFile(this, 'preview-course-thumb', 'preview-course-thumb-container')" class="w-full bg-white border border-gray-200 text-sm rounded-lg p-2 mb-2">
+                            <p class="text-[10px] text-center text-gray-500 font-bold mb-2">-- OR PASTE URL --</p>
+                            <input type="url" id="course-thumb-url" oninput="updateUrlPreview(this, 'preview-course-thumb', 'preview-course-thumb-container')" class="w-full bg-white border border-gray-200 text-sm rounded-lg p-2.5" placeholder="Paste Image URL here">
+                        </div>
+
+                        <!-- Live Preview -->
+                        <div class="md:col-span-2 hidden" id="preview-course-thumb-container">
+                            <img id="preview-course-thumb" src="" alt="" class="w-full h-48 object-cover rounded-xl border border-gray-200">
+                        </div>
+                    </div>
+
+                    <div class="border-t border-gray-200 pt-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <label class="block text-xs font-bold text-gray-600 uppercase">Video Lectures</label>
+                            <button type="button" onclick="addVideoField()" class="bg-blue-50 text-brandBlue font-bold text-xs px-3 py-1.5 rounded"><i class="fa-solid fa-plus"></i> Add Video</button>
+                        </div>
+                        <div id="video-fields-container" class="space-y-4">
+                            <div class="video-row bg-gray-50 p-4 rounded-xl border border-gray-200 relative space-y-2">
+                                <input type="text" placeholder="Video Title" required class="vid-title w-full bg-white border border-gray-200 text-sm rounded-lg p-2.5">
+                                <input type="url" placeholder="Video URL (Cloudinary/Drive link)" required class="vid-url w-full bg-white border border-gray-200 text-sm rounded-lg p-2.5">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="btn-submit-course" class="w-full bg-brandBlue text-white font-bold py-4 rounded-xl shadow-lg"><i class="fa-solid fa-cloud-arrow-up"></i> Publish Course</button>
+                </form>
+            </div>
+
+            <!-- Existing Courses -->
+            <div class="bg-white rounded-2xl shadow-sm border border-red-100 p-6 md:p-8">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 border-b border-gray-100 pb-2"><i class="fa-solid fa-trash-can text-red-500"></i> Delete Courses</h3>
+                <div id="existing-courses-list" class="space-y-3"></div>
+            </div>
+        </section>
+
+        <!-- TAB 3: MANAGE OFFLINE CENTRE (BASE64 UPLOADS) -->
+        <section id="manage-centre" class="tab-content max-w-3xl mx-auto space-y-6">
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 border-b border-gray-100 pb-2"><i class="fa-solid fa-image text-brandBlue"></i> Update Centre Assets</h3>
+                <form id="assets-form" class="space-y-5">
+
+                    <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Teacher Profile Photo</label>
+                        <input type="file" id="asset-teacher-file" accept="image/*" onchange="previewLocalFile(this, 'preview-teacher', 'preview-teacher-container')" class="w-full bg-white border border-gray-200 text-sm rounded-lg p-2 mb-2">
+                        <input type="url" id="asset-teacher" oninput="updateUrlPreview(this, 'preview-teacher', 'preview-teacher-container')" class="w-full bg-white border border-gray-200 text-sm rounded-lg p-2.5" placeholder="OR Paste Image URL">
+                        <div id="preview-teacher-container" class="hidden mt-3"><img id="preview-teacher" src="" alt="" class="w-20 h-20 object-cover rounded-full border-2 border-brandGold"></div>
+                    </div>
+
+                    <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Teacher Certificate Image</label>
+                        <input type="file" id="asset-tcert-file" accept="image/*" onchange="previewLocalFile(this, 'preview-tcert', 'preview-tcert-container')" class="w-full bg-white border border-gray-200 text-sm rounded-lg p-2 mb-2">
+                        <input type="url" id="asset-teacherCert" oninput="updateUrlPreview(this, 'preview-tcert', 'preview-tcert-container')" class="w-full bg-white border border-gray-200 text-sm rounded-lg p-2.5" placeholder="OR Paste Image URL">
+                        <div id="preview-tcert-container" class="hidden mt-3"><img id="preview-tcert" src="" alt="" class="h-24 object-contain rounded mx-auto border border-gray-200"></div>
+                    </div>
+
+                    <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Student Certificate Sample</label>
+                        <input type="file" id="asset-scert-file" accept="image/*" onchange="previewLocalFile(this, 'preview-scert', 'preview-scert-container')" class="w-full bg-white border border-gray-200 text-sm rounded-lg p-2 mb-2">
+                        <input type="url" id="asset-studentCert" oninput="updateUrlPreview(this, 'preview-scert', 'preview-scert-container')" class="w-full bg-white border border-gray-200 text-sm rounded-lg p-2.5" placeholder="OR Paste Image URL">
+                        <div id="preview-scert-container" class="hidden mt-3"><img id="preview-scert" src="" alt="" class="h-24 object-contain rounded mx-auto border border-gray-200"></div>
+                    </div>
+
+                    <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Centre Video (URL ONLY)</label>
+                        <input type="url" id="asset-centreVideo" class="w-full bg-white border border-gray-200 text-sm rounded-lg p-2.5" placeholder="Paste Video URL (Base64 videos are too large)">
+                    </div>
+
+                    <button type="submit" id="btn-update-assets" class="bg-brandBlue text-white text-sm font-bold px-5 py-4 rounded-xl w-full">Update All Assets</button>
+                </form>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Add Banner -->
+                <div class="bg-white rounded-2xl p-6 border border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 border-b border-gray-100 pb-2"><i class="fa-solid fa-panorama text-brandGold"></i> Manage Banners</h3>
+                    <form id="banner-form" class="space-y-4 mb-6">
+                        <div class="bg-yellow-50 p-3 rounded-xl border border-yellow-100">
+                            <input type="file" id="banner-file" accept="image/*" onchange="previewLocalFile(this, 'preview-banner', 'preview-banner-container')" class="w-full bg-white text-sm rounded-lg p-1.5 mb-2">
+                            <input type="url" id="banner-url" oninput="updateUrlPreview(this, 'preview-banner', 'preview-banner-container')" class="w-full bg-white text-sm rounded-lg p-2.5" placeholder="OR Paste Image URL">
+                        </div>
+                        <div id="preview-banner-container" class="hidden"><img id="preview-banner" src="" alt="" class="w-full h-24 object-cover rounded-lg"></div>
+                        <button type="submit" id="btn-add-banner" class="bg-brandGold text-brandBlue text-sm font-bold py-3 rounded-lg w-full">Upload Banner</button>
+                    </form>
+                    <div class="border-t border-gray-100 pt-4"><div id="existing-banners-list" class="grid grid-cols-2 gap-2"></div></div>
+                </div>
+
+                <!-- Add Gallery -->
+                <div class="bg-white rounded-2xl p-6 border border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 border-b border-gray-100 pb-2"><i class="fa-solid fa-images text-brandBlue"></i> Manage Gallery</h3>
+                    <form id="gallery-form" class="space-y-4 mb-6">
+                        <div class="bg-blue-50 p-3 rounded-xl border border-blue-100">
+                            <input type="file" id="gallery-file" accept="image/*" onchange="previewLocalFile(this, 'preview-gallery', 'preview-gallery-container')" class="w-full bg-white text-sm rounded-lg p-1.5 mb-2">
+                            <input type="url" id="gallery-url" oninput="updateUrlPreview(this, 'preview-gallery', 'preview-gallery-container')" class="w-full bg-white text-sm rounded-lg p-2.5" placeholder="OR Paste Image URL">
+                        </div>
+                        <div id="preview-gallery-container" class="hidden"><img id="preview-gallery" src="" alt="" class="w-32 h-32 object-cover rounded-lg mx-auto"></div>
+                        <button type="submit" id="btn-add-gallery" class="bg-brandBlue text-white text-sm font-bold py-3 rounded-lg w-full">Upload to Gallery</button>
+                    </form>
+                    <div class="border-t border-gray-100 pt-4"><div id="existing-gallery-list" class="grid grid-cols-3 gap-2"></div></div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- UI helpers (classic, global) then the hardened Firebase module -->
+    <script src="./js/ui.js"></script>
+    <script type="module" src="./js/admin.js"></script>
+</body>
+</html>
