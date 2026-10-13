@@ -13,7 +13,7 @@
 //     stays disabled (so it can never lock you out by accident);
 //     the real enforcement is the server-side firestore.rules.
 export const ADMIN_EMAILS = [
-    "REPLACE_WITH_YOUR_ADMIN_EMAIL@example.com"
+    "smarttechbaharagora01@gmail.com"
 ];
 
 const PLACEHOLDER = "REPLACE_WITH_YOUR_ADMIN_EMAIL@example.com";

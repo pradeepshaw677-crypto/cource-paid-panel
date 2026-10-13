@@ -1,16 +1,15 @@
 rules_version = '2';
 
 // ═══════════════════════════════════════════════════════════════════
-//  SMART TECH (smart-tech-d6528) — Firestore Security Rules  [DRAFT]
+//  SMART TECH (smart-tech-d6528) — Firestore Security Rules
 //  -----------------------------------------------------------------
-//  ⚠️  BEFORE YOU PUBLISH: replace EVERY occurrence of
-//      REPLACE_WITH_YOUR_ADMIN_EMAIL@example.com
-//      with the real admin login email of this Firebase project.
-//      (Same value you put in js/security.js → ADMIN_EMAILS.)
+//  Admin email set hai: smarttechbaharagora01@gmail.com
+//  (wahi email js/security.js → ADMIN_EMAILS me bhi hai).
+//  Agar admin email kabhi badle to DONO jagah badalna.
 //
-//  This is the REAL security. The public web apiKey can read whatever
-//  these rules allow — so locking reads/writes here is what stops a
-//  hacker from stealing data with just the apiKey.
+//  Ye rules hi ASLI security hain. Public web apiKey sirf wahi padh
+//  sakta hai jo ye rules allow karte hain — isliye inhe Console me
+//  PUBLISH karna zaroori hai, warna anonymous data padh sakta hai.
 // ═══════════════════════════════════════════════════════════════════
 
 service cloud.firestore {
@@ -23,7 +22,7 @@ service cloud.firestore {
     function isAdmin() {
       return signedIn()
         && request.auth.token.email in [
-             'REPLACE_WITH_YOUR_ADMIN_EMAIL@example.com'
+             'smarttechbaharagora01@gmail.com'
            ];
     }
 
@@ -53,12 +52,11 @@ service cloud.firestore {
     }
 
     // ── Course unlocks ───────────────────────────────────────────────
-    // docId = the student's lower-cased email. A student dashboard reads
-    // its OWN doc by id (get), but nobody can enumerate the whole
-    // collection (list) and only admin can change it.
-    match /unlocked_courses/{email} {
-      allow get:   if true;
-      allow list:  if isAdmin();
+    // docId = student ka AUTH UID (email nahi). Sirf wahi student apna
+    // doc padh sakta hai (uid match), enumerate koi nahi kar sakta,
+    // aur likh sirf admin sakta hai.
+    match /unlocked_courses/{uid} {
+      allow read:  if isAdmin() || (signedIn() && request.auth.uid == uid);
       allow write: if isAdmin();
     }
 

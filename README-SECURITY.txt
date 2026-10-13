@@ -84,6 +84,12 @@ Pages ka flow:
 • Purane already-approved students (jinme plaintext dashboardPass tha)
   abhi Firebase Auth me nahi hain. Unhe dobara approve karo ya
   naya username+password assign karo taaki Auth account ban jaaye.
+• Course Access (grant/revoke) ab student ke AUTH UID par likhta hai
+  (email par nahi). Admin jo email type karega, wo admission doc ke
+  email se match hona chahiye aur us admission me authUid hona chahiye
+  (yani naya approve kiya hua). Warna "linked nahi" error aayega —
+  ye jaan-boojh kar hai taaki koi galat/random email par unlock na kar
+  sake aur student ko hamesha wahi mile jo admin ne diya.
 
 
 ───────────────────────────────────────────────────────────────────

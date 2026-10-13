@@ -11,7 +11,8 @@ import {
     onAuthStateChanged, signOut
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import {
-    getFirestore, collection, doc, setDoc, deleteDoc, addDoc, onSnapshot
+    getFirestore, collection, doc, setDoc, deleteDoc, addDoc, onSnapshot,
+    getDocs, query, where, limit
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import {
     esc, safeImgUrl, safeMediaUrl, isAdminEmail, adminListConfigured, normalizeEmail
@@ -181,6 +182,16 @@ if (addCourseForm) addCourseForm.addEventListener('submit', async (e) => {
 });
 
 // ── GRANT / REVOKE ACCESS ────────────────────────────────────────
+// unlocked_courses ab student ke AUTH UID se key hota hai (email se nahi),
+// taaki student dashboard wahi padhe jo admin grant kare. Email se uid
+// admission doc (authUid) ke zariye nikalte hain.
+async function findStudentUidByEmail(email) {
+    const q = query(collection(db, "offline_admissions"), where("email", "==", email), limit(1));
+    const snap = await getDocs(q);
+    if (snap.empty) return null;
+    return (snap.docs[0].data() || {}).authUid || null;
+}
+
 const accessForm = document.getElementById('access-form');
 if (accessForm) accessForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -188,7 +199,9 @@ if (accessForm) accessForm.addEventListener('submit', async (e) => {
     const courseId = document.getElementById('course-select').value;
     if (!email || !courseId) { showAlert("Email and course dono zaroori hai.", false); return; }
     try {
-        await setDoc(doc(db, "unlocked_courses", email), { [courseId]: true }, { merge: true });
+        const uid = await findStudentUidByEmail(email);
+        if (!uid) { showAlert("Ye email kisi approved student se linked nahi. Pehle admission approve karo (naya system).", false); return; }
+        await setDoc(doc(db, "unlocked_courses", uid), { [courseId]: true }, { merge: true });
         showAlert("Access Granted", true);
         e.target.reset();
     } catch (err) { showAlert("Error: " + err.message, false); }
@@ -201,7 +214,9 @@ if (lockBtn) lockBtn.addEventListener('click', async () => {
     if (!email || !courseId) { showAlert("Email and course dono zaroori hai.", false); return; }
     if (confirm("Lock course?")) {
         try {
-            await setDoc(doc(db, "unlocked_courses", email), { [courseId]: false }, { merge: true });
+            const uid = await findStudentUidByEmail(email);
+            if (!uid) { showAlert("Ye email kisi approved student se linked nahi.", false); return; }
+            await setDoc(doc(db, "unlocked_courses", uid), { [courseId]: false }, { merge: true });
             showAlert("Access Revoked", true);
             document.getElementById('access-form').reset();
         } catch (err) { showAlert("Error: " + err.message, false); }

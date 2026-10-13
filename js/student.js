@@ -12,7 +12,7 @@ import {
     getFirestore, collection, doc, getDoc, getDocs, query, where, limit
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import {
-    esc, safeImgUrl, safeMediaUrl, studentEmail, normalizeEmail
+    esc, safeImgUrl, safeMediaUrl, studentEmail
 } from './security.js';
 
 const db = getFirestore(app);
@@ -95,14 +95,12 @@ async function loadDashboard(uid) {
         }
         const adm = admSnap.docs[0].data();
         document.getElementById('s-student-name').textContent = adm.name || '';
-        const studentRealEmail = normalizeEmail(adm.email);
 
-        // 2) Kaun se courses unlock hain (docId = student ka email).
+        // 2) Kaun se courses unlock hain — docId = student ka AUTH UID
+        //    (admin isi uid par grant karta hai, isliye hamesha match hoga).
         let unlocked = {};
-        if (studentRealEmail) {
-            const uDoc = await getDoc(doc(db, "unlocked_courses", studentRealEmail));
-            if (uDoc.exists()) unlocked = uDoc.data() || {};
-        }
+        const uDoc = await getDoc(doc(db, "unlocked_courses", uid));
+        if (uDoc.exists()) unlocked = uDoc.data() || {};
 
         // 3) Saare courses → sirf unlocked dikhao.
         const cSnap = await getDocs(collection(db, "courses"));
